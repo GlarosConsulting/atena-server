@@ -1,18 +1,12 @@
 /* eslint-disable import/no-duplicates */
 import { Request, Response } from 'express';
-import { SchemaOptions } from 'celebrate';
 import { parseISO, format, isAfter, isBefore } from 'date-fns';
 import ptBrLocale from 'date-fns/locale/pt-BR';
 
-import AgreementRepository, {
+import AgreementsRepository, {
   Agreement,
-} from '~/repositories/AgreementRepository';
+} from '~/repositories/AgreementsRepository';
 import BuildAgreementsStatisticsService from '~/services/BuildAgreementsStatisticsService';
-
-interface HandlerSchema {
-  options: () => SchemaOptions;
-  handle: (request: Request, response: Response) => Promise<Response<any>>;
-}
 
 class AgreementController {
   async index(request: Request, response: Response) {
@@ -35,7 +29,7 @@ class AgreementController {
       ValorLicitacao,
     } = request.query as { [key: string]: string };
 
-    let agreements = await AgreementRepository.findAll();
+    let agreements = await AgreementsRepository.findAll();
 
     const compareCaseInsensitive = (
       str: string | null,
@@ -77,8 +71,8 @@ class AgreementController {
     if (NumProcessoLicitacao)
       agreements = agreements.filter(agreement =>
         compareCaseInsensitive(
-          agreement.proposalData?.data?.proccessId
-            ? agreement.proposalData?.data?.proccessId
+          agreement.proposalData?.data?.processId
+            ? agreement.proposalData?.data?.processId
             : null,
           NumProcessoLicitacao,
         ),
@@ -156,34 +150,40 @@ class AgreementController {
       );
     if (ModalidadeLicitacao)
       agreements = agreements.filter(agreement =>
-        agreement.convenientExecution.executionProcesses.some(process =>
-          compareCaseInsensitive(process.type, ModalidadeLicitacao),
-        ),
+        agreement.convenientExecution
+          ? agreement.convenientExecution.executionProcesses.some(process =>
+              compareCaseInsensitive(process.type, ModalidadeLicitacao),
+            )
+          : true,
       );
     if (RegistroDePreco)
       agreements = agreements.filter(agreement =>
-        agreement.convenientExecution.executionProcesses.some(process =>
-          compareCaseInsensitive(
-            process.date
-              ? format(process.date, 'dd/MM/yyyy', { locale: ptBrLocale })
-              : null,
-            RegistroDePreco,
-          ),
-        ),
+        agreement.convenientExecution
+          ? agreement.convenientExecution.executionProcesses.some(process =>
+              compareCaseInsensitive(
+                process.date
+                  ? format(process.date, 'dd/MM/yyyy', { locale: ptBrLocale })
+                  : null,
+                RegistroDePreco,
+              ),
+            )
+          : true,
       );
     if (ValorLicitacao)
       agreements = agreements.filter(agreement =>
-        agreement.proposalData.programs.some(program =>
-          compareCaseInsensitive(
-            program.value
-              ? Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }).format(program.value)
-              : null,
-            ValorLicitacao,
-          ),
-        ),
+        agreement.proposalData
+          ? agreement.proposalData.programs.some(program =>
+              compareCaseInsensitive(
+                program.value
+                  ? Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    }).format(program.value)
+                  : null,
+                ValorLicitacao,
+              ),
+            )
+          : true,
       );
 
     const buildAgreementsStatistics = new BuildAgreementsStatisticsService(
@@ -199,7 +199,7 @@ class AgreementController {
   async show(request: Request, response: Response) {
     const { id } = request.params;
 
-    const agreement = await AgreementRepository.findById(id);
+    const agreement = await AgreementsRepository.findById(id);
 
     if (!agreement) {
       return response
@@ -226,9 +226,10 @@ class AgreementController {
         proposalData,
         workPlan,
         convenientExecution,
+        accountability,
       } = item;
 
-      return AgreementRepository.create({
+      return AgreementsRepository.create({
         agreementId,
         name,
         uf,
@@ -239,97 +240,166 @@ class AgreementController {
         program,
         proposalData: {
           create: {
-            data: {
-              create: {
-                ...proposalData.data,
-                status: { create: proposalData.data.status },
-              },
-            },
-            programs: { create: proposalData.programs },
-            participants: { create: proposalData.participants },
+            data: proposalData.data
+              ? {
+                  create: {
+                    ...proposalData.data,
+                    status: { create: proposalData.data.status },
+                  },
+                }
+              : undefined,
+            programs: Array.isArray(proposalData.programs)
+              ? {
+                  create: proposalData.programs.map((el: any) => ({
+                    ...el,
+                    details: el.details
+                      ? {
+                          create: {
+                            ...el.details,
+                            couterpartValues: {
+                              create: el.details.counterpartValues,
+                            },
+                            transferValues: {
+                              create: el.details.transferValues,
+                            },
+                          },
+                        }
+                      : null,
+                  })),
+                }
+              : undefined,
+            participants: proposalData.participants
+              ? {
+                  create: proposalData.participants,
+                }
+              : undefined,
           },
         },
         workPlan: {
           create: {
             physicalChrono: {
-              create: {
-                list: { create: workPlan.physicalChrono.list },
-                values: { create: workPlan.physicalChrono.values },
-              },
+              create: workPlan.physicalChrono
+                ? {
+                    list: { create: workPlan.physicalChrono.list },
+                    values: { create: workPlan.physicalChrono.values },
+                  }
+                : undefined,
             },
             disbursementChrono: {
-              create: {
-                list: { create: workPlan.disbursementChrono.list },
-                values: {
-                  create: {
-                    registered: {
-                      create: workPlan.disbursementChrono.values.registered,
+              create: workPlan.disbursementChrono
+                ? {
+                    list: { create: workPlan.disbursementChrono.list },
+                    values: {
+                      create: {
+                        registered: {
+                          create: workPlan.disbursementChrono.values.registered,
+                        },
+                        register: {
+                          create: workPlan.disbursementChrono.values.register,
+                        },
+                        total: {
+                          create: workPlan.disbursementChrono.values.total,
+                        },
+                      },
                     },
-                    register: {
-                      create: workPlan.disbursementChrono.values.register,
-                    },
-                    total: { create: workPlan.disbursementChrono.values.total },
-                  },
-                },
-              },
+                  }
+                : undefined,
             },
             detailedApplicationPlan: {
-              create: {
-                list: { create: workPlan.detailedApplicationPlan.list },
-                values: {
-                  create: {
-                    assets: {
-                      create: workPlan.detailedApplicationPlan.values.assets,
+              create: workPlan.detailedApplicationPlan
+                ? {
+                    list: { create: workPlan.detailedApplicationPlan.list },
+                    values: {
+                      create: {
+                        assets: {
+                          create:
+                            workPlan.detailedApplicationPlan.values.assets,
+                        },
+                        tributes: {
+                          create:
+                            workPlan.detailedApplicationPlan.values.tributes,
+                        },
+                        construction: {
+                          create:
+                            workPlan.detailedApplicationPlan.values
+                              .construction,
+                        },
+                        services: {
+                          create:
+                            workPlan.detailedApplicationPlan.values.services,
+                        },
+                        others: {
+                          create:
+                            workPlan.detailedApplicationPlan.values.others,
+                        },
+                        administrative: {
+                          create:
+                            workPlan.detailedApplicationPlan.values
+                              .administrative,
+                        },
+                        total: {
+                          create: workPlan.detailedApplicationPlan.values.total,
+                        },
+                      },
                     },
-                    tributes: {
-                      create: workPlan.detailedApplicationPlan.values.tributes,
-                    },
-                    construction: {
-                      create:
-                        workPlan.detailedApplicationPlan.values.construction,
-                    },
-                    services: {
-                      create: workPlan.detailedApplicationPlan.values.services,
-                    },
-                    others: {
-                      create: workPlan.detailedApplicationPlan.values.others,
-                    },
-                    administrative: {
-                      create:
-                        workPlan.detailedApplicationPlan.values.administrative,
-                    },
-                    total: {
-                      create: workPlan.detailedApplicationPlan.values.total,
-                    },
-                  },
-                },
-              },
+                  }
+                : undefined,
             },
             consolidatedApplicationPlan: {
-              create: {
-                list: { create: workPlan.consolidatedApplicationPlan.list },
-                total: { create: workPlan.consolidatedApplicationPlan.total },
-              },
+              create: workPlan.consolidatedApplicationPlan
+                ? {
+                    list: { create: workPlan.consolidatedApplicationPlan.list },
+                    total: {
+                      create: workPlan.consolidatedApplicationPlan.total,
+                    },
+                  }
+                : undefined,
             },
             attachments: {
-              create: {
-                proposalList: { create: workPlan.attachments.proposalList },
-                executionList: { create: workPlan.attachments.executionList },
-              },
+              create: workPlan.attachments
+                ? {
+                    proposalList: { create: workPlan.attachments.proposalList },
+                    executionList: {
+                      create: workPlan.attachments.executionList,
+                    },
+                  }
+                : undefined,
             },
             notions: {
-              create: {
-                proposalList: { create: workPlan.notions.proposalList },
-                workPlanList: { create: workPlan.notions.workPlanList },
-              },
+              create: workPlan.notions
+                ? {
+                    proposalList: { create: workPlan.notions.proposalList },
+                    workPlanList: { create: workPlan.notions.workPlanList },
+                  }
+                : undefined,
             },
           },
         },
         convenientExecution: {
           create: {
-            executionProcesses: {
-              create: convenientExecution.executionProcesses,
-            },
+            executionProcesses: Array.isArray(
+              convenientExecution.executionProcesses,
+            )
+              ? {
+                  create: convenientExecution.executionProcesses.map(
+                    (el: any) => ({
+                      ...el,
+                      details: {
+                        create: el.details,
+                      },
+                    }),
+                  ),
+                }
+              : undefined,
+          },
+        },
+        accountability: {
+          create: {
+            data: accountability.data
+              ? {
+                  create: accountability.data,
+                }
+              : undefined,
           },
         },
       });
@@ -344,7 +414,7 @@ class AgreementController {
     const { id } = request.params;
     const { name, status, start, end, program } = request.body;
 
-    const agreementExistsById = await AgreementRepository.existsById(id);
+    const agreementExistsById = await AgreementsRepository.existsById(id);
 
     if (!agreementExistsById) {
       return response
@@ -352,7 +422,7 @@ class AgreementController {
         .json({ error: 'No agreement found with this ID.' });
     }
 
-    const agreement = await AgreementRepository.update(id, {
+    const agreement = await AgreementsRepository.update(id, {
       name,
       status,
       start,
@@ -366,7 +436,7 @@ class AgreementController {
   async delete(request: Request, response: Response) {
     const { id } = request.params;
 
-    const agreementExistsById = await AgreementRepository.existsById(id);
+    const agreementExistsById = await AgreementsRepository.existsById(id);
 
     if (!agreementExistsById) {
       return response
@@ -374,9 +444,20 @@ class AgreementController {
         .json({ error: 'No agreement found with this ID.' });
     }
 
-    const agreement = await AgreementRepository.delete(id);
+    const agreement = await AgreementsRepository.delete(id);
 
     return response.json(agreement);
+  }
+
+  async test(request: Request, response: Response) {
+    const agreements = await AgreementsRepository.getTest([
+      'Maceió',
+      'Campestre',
+    ]);
+
+    return response
+      .header('X-Total-Count', String(agreements.length))
+      .json(agreements);
   }
 }
 

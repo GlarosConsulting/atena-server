@@ -1,3 +1,7 @@
 # Prisma Migrate lockfile v1
 
-20200625171041-initial
+20200630141712-initial
+20200708135437-create-companies
+20200710131955-create-cities-and-users
+20200710153456-add-unique-flag-to-field-ibge
+20200714125855-create-groups

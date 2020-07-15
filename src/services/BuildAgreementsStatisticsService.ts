@@ -1,4 +1,4 @@
-import { Agreement } from '~/repositories/AgreementRepository';
+import { Agreement } from '~/repositories/AgreementsRepository';
 
 interface Statistics {
   total: StatisticsItem;
@@ -22,10 +22,12 @@ class BuildAgreementsStatisticsService {
       value: this.agreements.reduce(
         (accumulator, agreement) =>
           accumulator +
-          agreement.proposalData.programs.reduce(
-            (accumulator2, program) => accumulator2 + (program.value || 0),
-            0,
-          ),
+          (agreement.proposalData
+            ? agreement.proposalData.programs.reduce(
+                (accumulator2, program) => accumulator2 + (program.value || 0),
+                0,
+              )
+            : 0),
         0,
       ),
     };

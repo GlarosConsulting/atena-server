@@ -3,7 +3,7 @@
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -500,12 +500,12 @@ model AccountabilityData {
 model City {
   @@map(name: "cities")
 
-  id        String    @default(uuid()) @id
-  name      String
-  uf        String
-  ibge      String    @unique
-  companies Company[]
-  groups    Group[]
+  id      String    @default(uuid()) @id
+  name    String
+  uf      String
+  ibge    String    @unique
+  company Company[]
+  user    User[]
 }
 
 model Company {
@@ -526,15 +526,5 @@ model User {
   username String
   email    String
   active   Boolean @default(true)
-  group    Group   @relation(fields: [groupId], references: [id])
-  groupId  String
-}
-
-model Group {
-  @@map(name: "groups")
-
-  id     String @default(uuid()) @id
-  name   String
-  cities City[]
-  users  User[]
+  group    City[]
 }

@@ -1,13 +1,13 @@
-import express from 'express';
-import { celebrate, SchemaOptions, Joi } from 'celebrate';
+import { Router } from 'express';
+import { celebrate, Joi } from 'celebrate';
 
-import AgreementController from './controllers/AgreementController';
+import AgreementController from '~/controllers/AgreementController';
 
-const routes = express.Router();
+const agreementsRouter = Router();
 
-routes.get('/agreements', AgreementController.index);
-routes.get(
-  '/agreements/:id',
+agreementsRouter.get('/', AgreementController.index);
+agreementsRouter.get(
+  '/:id',
   celebrate(
     {
       params: Joi.object({
@@ -18,9 +18,9 @@ routes.get(
   ),
   AgreementController.show,
 );
-routes.post('/agreements', AgreementController.create);
-routes.put(
-  '/agreements/:id',
+agreementsRouter.post('', AgreementController.create);
+agreementsRouter.put(
+  '/:id',
   celebrate(
     {
       params: Joi.object({
@@ -39,8 +39,8 @@ routes.put(
   ),
   AgreementController.update,
 );
-routes.delete(
-  '/agreements/:id',
+agreementsRouter.delete(
+  '/:id',
   celebrate(
     {
       params: Joi.object({
@@ -51,5 +51,6 @@ routes.delete(
   ),
   AgreementController.delete,
 );
+agreementsRouter.patch('/test', AgreementController.test);
 
-export default routes;
+export default agreementsRouter;

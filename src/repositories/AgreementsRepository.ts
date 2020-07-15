@@ -3,7 +3,7 @@ import {
   AgreementCreateInput,
   AgreementUpdateInput,
 } from '@prisma/client';
-import BaseRepository from './BaseRepository';
+import Repository from './Repository';
 
 export type Agreement = AgreementGetPayload<{
   include: {
@@ -66,10 +66,15 @@ export type Agreement = AgreementGetPayload<{
         executionProcesses: true;
       };
     };
+    accountability: {
+      include: {
+        data: true;
+      };
+    };
   };
 }>;
 
-class AgreementRepository extends BaseRepository<
+class AgreementRepository extends Repository<
   Agreement,
   AgreementCreateInput,
   AgreementUpdateInput
@@ -82,7 +87,16 @@ class AgreementRepository extends BaseRepository<
             status: true,
           },
         },
-        programs: true,
+        programs: {
+          include: {
+            details: {
+              include: {
+                couterpartValues: true,
+                transferValues: true,
+              },
+            },
+          },
+        },
         participants: true,
       },
     },
@@ -134,6 +148,11 @@ class AgreementRepository extends BaseRepository<
         executionProcesses: true,
       },
     },
+    accountability: {
+      include: {
+        data: true,
+      },
+    },
   };
 
   findAll(): Promise<Agreement[]> {
@@ -172,6 +191,26 @@ class AgreementRepository extends BaseRepository<
     const count = await this.prisma.agreement.count({ where: { id } });
 
     return count > 0;
+  }
+
+  async getTest(cities: string[]): Promise<Agreement[]> {
+    const agreements = await this.prisma.agreement.findMany({
+      where: {
+        city: {
+          in: cities,
+        },
+        accountability: {
+          data: {
+            transferValue: {
+              in: 975000,
+            },
+          },
+        },
+      },
+      include: this.include,
+    });
+
+    return agreements;
   }
 }
 

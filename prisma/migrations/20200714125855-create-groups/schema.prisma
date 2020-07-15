@@ -13,18 +13,19 @@ generator client {
 model Agreement {
   @@map(name: "agreements")
 
-  id                  String              @default(uuid()) @id
-  agreementId         String
-  uf                  String
-  city                String
-  name                String
-  status              String
-  start               DateTime
-  end                 DateTime
-  program             String
-  proposalData        ProposalData
-  workPlan            WorkPlan
-  convenientExecution ConvenientExecution
+  id                  String               @default(uuid()) @id
+  agreementId         String?
+  uf                  String?
+  city                String?
+  name                String?
+  status              String?
+  start               DateTime?
+  end                 DateTime?
+  program             String?
+  proposalData        ProposalData?
+  workPlan            WorkPlan?
+  convenientExecution ConvenientExecution?
+  accountability      Accountability?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -33,8 +34,8 @@ model Agreement {
 model ProposalData {
   @@map(name: "proposals_data")
 
-  id           String       @default(uuid()) @id
-  agreement    Agreement?   @relation(fields: [agreementId], references: [id])
+  id           String        @default(uuid()) @id
+  agreement    Agreement?    @relation(fields: [agreementId], references: [id])
   agreementId  String?
   data         Data?
   programs     Program[]
@@ -52,7 +53,7 @@ model Data {
   status                        Status
   proposalId                    String?
   organId                       String?
-  proccessId                    String?
+  processId                     String?
   proponent                     String?
   legalFoundation               String?
   organ                         String?
@@ -85,12 +86,50 @@ model Status {
 model Program {
   @@map(name: "programs")
 
-  id             String        @default(uuid()) @id
-  programId      Int
-  proposalData   ProposalData? @relation(fields: [proposalDataId], references: [id])
+  id             String          @default(uuid()) @id
+  proposalData   ProposalData?   @relation(fields: [proposalDataId], references: [id])
   proposalDataId String?
+  programId      String?
   name           String?
-  value          Float?        @default(0)
+  value          Float?          @default(0)
+  details        ProgramDetails?
+}
+
+model ProgramDetails {
+  @@map(name: "programs_details")
+
+  id               String                           @default(uuid()) @id
+  program          Program?                         @relation(fields: [programId], references: [id])
+  programId        String?
+  code             String?
+  name             String?
+  cps              String?
+  items            String?
+  couterpartRule   String?
+  totalValue       Float?
+  couterpartValues ProgramDetailsCounterpartValues?
+  transferValues   ProgramDetailsTransferValues?
+}
+
+model ProgramDetailsCounterpartValues {
+  @@map(name: "programs_details_counterpart_values")
+
+  id                String          @default(uuid()) @id
+  programDetails    ProgramDetails? @relation(fields: [programDetailsId], references: [id])
+  programDetailsId  String?
+  total             Float?
+  financial         Float?
+  assetsAndServices Float?
+}
+
+model ProgramDetailsTransferValues {
+  @@map(name: "programs_details_transfer_values")
+
+  id               String          @default(uuid()) @id
+  programDetails   ProgramDetails? @relation(fields: [programDetailsId], references: [id])
+  programDetailsId String?
+  total            Float?
+  amendment        String?
 }
 
 model Participants {
@@ -99,34 +138,34 @@ model Participants {
   id             String        @default(uuid()) @id
   proposalData   ProposalData? @relation(fields: [proposalDataId], references: [id])
   proposalDataId String?
-  proponent      String
-  respProponent  String
-  grantor        String
-  respGrantor    String
+  proponent      String?
+  respProponent  String?
+  grantor        String?
+  respGrantor    String?
 }
 
 model WorkPlan {
   @@map(name: "work_plans")
 
-  id                          String                      @default(uuid()) @id
-  agreement                   Agreement?                  @relation(fields: [agreementId], references: [id])
+  id                          String                       @default(uuid()) @id
+  agreement                   Agreement?                   @relation(fields: [agreementId], references: [id])
   agreementId                 String?
-  physicalChrono              PhysicalChrono
-  disbursementChrono          DisbursementChrono
-  detailedApplicationPlan     DetailedApplicationPlan
-  consolidatedApplicationPlan ConsolidatedApplicationPlan
-  attachments                 Attachments
-  notions                     Notions
+  physicalChrono              PhysicalChrono?
+  disbursementChrono          DisbursementChrono?
+  detailedApplicationPlan     DetailedApplicationPlan?
+  consolidatedApplicationPlan ConsolidatedApplicationPlan?
+  attachments                 Attachments?
+  notions                     Notions?
 }
 
 model PhysicalChrono {
   @@map(name: "physical_chronos")
 
-  id         String               @default(uuid()) @id
-  workPlan   WorkPlan?            @relation(fields: [workPlanId], references: [id])
+  id         String                @default(uuid()) @id
+  workPlan   WorkPlan?             @relation(fields: [workPlanId], references: [id])
   workPlanId String?
   list       PhysicalChronoItem[]
-  values     PhysicalChronoValues
+  values     PhysicalChronoValues?
 }
 
 model PhysicalChronoItem {
@@ -157,11 +196,11 @@ model PhysicalChronoValues {
 model DisbursementChrono {
   @@map(name: "disbursement_chronos")
 
-  id         String                   @default(uuid()) @id
-  workPlan   WorkPlan?                @relation(fields: [workPlanId], references: [id])
+  id         String                    @default(uuid()) @id
+  workPlan   WorkPlan?                 @relation(fields: [workPlanId], references: [id])
   workPlanId String?
   list       DisbursementChronoItem[]
-  values     DisbursementChronoValues
+  values     DisbursementChronoValues?
 }
 
 model DisbursementChronoItem {
@@ -206,11 +245,11 @@ model DisbursementChronoValue {
 model DetailedApplicationPlan {
   @@map(name: "detailed_application_plans")
 
-  id         String                        @default(uuid()) @id
-  workPlan   WorkPlan?                     @relation(fields: [workPlanId], references: [id])
+  id         String                         @default(uuid()) @id
+  workPlan   WorkPlan?                      @relation(fields: [workPlanId], references: [id])
   workPlanId String?
   list       DetailedApplicationPlanItem[]
-  values     DetailedApplicationPlanValues
+  values     DetailedApplicationPlanValues?
 }
 
 model DetailedApplicationPlanItem {
@@ -349,13 +388,14 @@ model ConvenientExecution {
   agreement          Agreement?         @relation(fields: [agreementId], references: [id])
   agreementId        String?
   executionProcesses ExecutionProcess[]
+  contracts          Contract[]
 }
 
 model ExecutionProcess {
   @@map(name: "execution_processes")
 
-  id                    String              @default(uuid()) @id
-  convenientExecution   ConvenientExecution @relation(fields: [convenientExecutionId], references: [id])
+  id                    String                   @default(uuid()) @id
+  convenientExecution   ConvenientExecution      @relation(fields: [convenientExecutionId], references: [id])
   convenientExecutionId String
   executionId           String?
   type                  String?
@@ -365,4 +405,136 @@ model ExecutionProcess {
   systemStatus          String?
   system                String?
   accepted              String?
+  details               ExecutionProcessDetails?
+}
+
+model ExecutionProcessDetails {
+  @@map(name: "execution_processes_details")
+
+  id                    String           @default(uuid()) @id
+  executionProcessRel   ExecutionProcess @relation(fields: [executionProcessRelId], references: [id])
+  executionProcessRelId String
+  executionProcess      String?
+  buyType               String?
+  status                String?
+  origin                String?
+  financialResource     String?
+  modality              String?
+  biddingType           String?
+  processId             String?
+  biddingId             String?
+  object                String?
+  legalFoundation       String?
+  justification         String?
+  publishDate           DateTime?
+  beginDate             DateTime?
+  endDate               DateTime?
+  biddingValue          Float?
+  homologationDate      DateTime?
+  city                  String?
+  analysisDate          DateTime?
+  accepted              String?
+}
+
+model Contract {
+  @@map(name: "contracts")
+
+  id                    String              @default(uuid()) @id
+  convenientExecution   ConvenientExecution @relation(fields: [convenientExecutionId], references: [id])
+  convenientExecutionId String
+  contractId            String?
+  biddingId             String?
+  date                  DateTime?
+  details               ContractDetails?
+}
+
+model ContractDetails {
+  @@map(name: "contracts_details")
+
+  id                 String    @default(uuid()) @id
+  contract           Contract  @relation(fields: [contractId], references: [id])
+  contractId         String
+  hiredDocument      String?
+  hirerDocument      String?
+  type               String?
+  object             String?
+  totalValue         Float?
+  publishDate        DateTime?
+  beginDate          DateTime?
+  endDate            DateTime?
+  signDate           DateTime?
+  executionProcessId String?
+  biddingModality    String?
+  processId          String?
+}
+
+model Accountability {
+  @@map(name: "accountabilities")
+
+  id          String              @default(uuid()) @id
+  agreement   Agreement?          @relation(fields: [agreementId], references: [id])
+  agreementId String?
+  data        AccountabilityData?
+}
+
+model AccountabilityData {
+  @@map(name: "accountabilities_data")
+
+  id               String          @default(uuid()) @id
+  accountabilty    Accountability? @relation(fields: [accountabiltyId], references: [id])
+  accountabiltyId  String?
+  organ            String?
+  convenient       String?
+  documentNumber   String?
+  modality         String?
+  status           String?
+  number           String?
+  validity         String?
+  limitDate        DateTime?
+  totalValue       Float?
+  transferValue    Float?
+  counterpartValue Float?
+  yieldValue       Float?
+}
+
+model City {
+  @@map(name: "cities")
+
+  id        String    @default(uuid()) @id
+  name      String
+  uf        String
+  ibge      String    @unique
+  companies Company[]
+  groups    Group[]
+}
+
+model Company {
+  @@map(name: "companies")
+
+  id     String @default(uuid()) @id
+  cnpj   String @unique
+  name   String
+  city   City   @relation(fields: [cityId], references: [id])
+  cityId String
+  sphere String
+}
+
+model User {
+  @@map(name: "users")
+
+  id       String  @default(uuid()) @id
+  username String
+  email    String
+  active   Boolean @default(true)
+  group    Group   @relation(fields: [groupId], references: [id])
+  groupId  String
+}
+
+model Group {
+  @@map(name: "groups")
+
+  id     String @default(uuid()) @id
+  name   String
+  cities City[]
+  users  User[]
 }
