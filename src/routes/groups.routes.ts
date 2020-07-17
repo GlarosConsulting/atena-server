@@ -11,7 +11,11 @@ groupsRouter.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required(),
-      cities: Joi.array().items(Joi.string().uuid()).min(1),
+      access: Joi.string()
+        .uppercase()
+        .valid('ANY', 'MUNICIPAL_SPHERE', 'STATE_SPHERE', 'CITIES')
+        .required(),
+      cityIds: Joi.array().items(Joi.string().uuid()).min(1),
     }),
   }),
   GroupController.create,
@@ -24,7 +28,10 @@ groupsRouter.put(
     },
     body: Joi.object().keys({
       name: Joi.string(),
-      cities: Joi.array().items(Joi.string().uuid()),
+      access: Joi.string()
+        .uppercase()
+        .valid('ANY', 'MUNICIPAL_SPHERE', 'STATE_SPHERE', 'CITIES'),
+      cityIds: Joi.array().items(Joi.string().uuid()),
     }),
   }),
   GroupController.update,

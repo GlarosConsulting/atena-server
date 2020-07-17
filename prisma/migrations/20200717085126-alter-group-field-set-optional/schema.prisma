@@ -3,63 +3,11 @@
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
   provider = "prisma-client-js"
-}
-
-model City {
-  @@map(name: "cities")
-
-  id        String    @default(uuid()) @id
-  name      String
-  uf        String
-  ibge      String    @unique
-  companies Company[]
-  groups    Group[]
-}
-
-model Company {
-  @@map(name: "companies")
-
-  id         String      @default(uuid()) @id
-  cnpj       String      @unique
-  name       String
-  city       City        @relation(fields: [cityId], references: [id])
-  cityId     String
-  sphere     String
-  agreements Agreement[]
-}
-
-model User {
-  @@map(name: "users")
-
-  id       String  @default(uuid()) @id
-  name     String
-  username String  @unique
-  email    String  @unique
-  active   Boolean @default(true)
-  group    Group?  @relation(fields: [groupId], references: [id])
-  groupId  String?
-}
-
-model Group {
-  @@map(name: "groups")
-
-  id     String      @default(uuid()) @id
-  name   String
-  access GroupAccess @default(ANY)
-  cities City[]
-  users  User[]
-}
-
-enum GroupAccess {
-  ANY
-  MUNICIPAL_SPHERE
-  STATE_SPHERE
-  CITIES
 }
 
 model Agreement {
@@ -67,8 +15,8 @@ model Agreement {
 
   id                  String               @default(uuid()) @id
   agreementId         String?
-  company             Company?             @relation(fields: [companyId], references: [id])
-  companyId           String?
+  uf                  String?
+  city                String?
   name                String?
   status              String?
   start               DateTime?
@@ -547,4 +495,55 @@ model AccountabilityData {
   transferValue    Float?
   counterpartValue Float?
   yieldValue       Float?
+}
+
+model City {
+  @@map(name: "cities")
+
+  id        String    @default(uuid()) @id
+  name      String
+  uf        String
+  ibge      String    @unique
+  companies Company[]
+  groups    Group[]
+}
+
+model Company {
+  @@map(name: "companies")
+
+  id     String @default(uuid()) @id
+  cnpj   String @unique
+  name   String
+  city   City   @relation(fields: [cityId], references: [id])
+  cityId String
+  sphere String
+}
+
+model User {
+  @@map(name: "users")
+
+  id       String  @default(uuid()) @id
+  name     String
+  username String  @unique
+  email    String  @unique
+  active   Boolean @default(true)
+  group    Group?  @relation(fields: [groupId], references: [id])
+  groupId  String?
+}
+
+model Group {
+  @@map(name: "groups")
+
+  id     String      @default(uuid()) @id
+  name   String
+  access GroupAccess @default(ANY)
+  cities City[]
+  users  User[]
+}
+
+enum GroupAccess {
+  ANY
+  MUNICIPAL_SPHERE
+  STATE_SPHERE
+  CITIES
 }

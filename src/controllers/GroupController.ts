@@ -12,9 +12,9 @@ class GroupController {
   }
 
   async create(request: Request, response: Response) {
-    const { name, cities }: { name: string; cities: string[] } = request.body;
+    const { name, access, cityIds } = request.body;
 
-    const checkAllCitiesExists = await everyAsync(cities, cityId =>
+    const checkAllCitiesExists = await everyAsync(cityIds, cityId =>
       CitiesRepository.existsById(cityId),
     );
 
@@ -26,8 +26,9 @@ class GroupController {
 
     const group = await GroupsRepository.create({
       name,
+      access,
       cities: {
-        connect: cities.map(cityId => ({ id: cityId })),
+        connect: (cityIds as string[]).map(cityId => ({ id: cityId })),
       },
     });
 
@@ -36,7 +37,7 @@ class GroupController {
 
   async update(request: Request, response: Response) {
     const { id } = request.params;
-    const { name, cities }: { name: string; cities: string[] } = request.body;
+    const { name, access, cityIds } = request.body;
 
     const checkGroupExists = await GroupsRepository.existsById(id);
 
@@ -46,7 +47,7 @@ class GroupController {
         .json({ error: 'No group found with this ID.' });
     }
 
-    const checkAllCitiesExists = await everyAsync(cities, cityId =>
+    const checkAllCitiesExists = await everyAsync(cityIds, cityId =>
       CitiesRepository.existsById(cityId),
     );
 
@@ -58,8 +59,9 @@ class GroupController {
 
     const updatedGroup = await GroupsRepository.update(id, {
       name,
+      access,
       cities: {
-        set: cities.map(cityId => ({ id: cityId })),
+        set: (cityIds as string[]).map(cityId => ({ id: cityId })),
       },
     });
 

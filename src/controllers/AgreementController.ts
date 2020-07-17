@@ -13,6 +13,7 @@ class AgreementController {
     const {
       beginDate,
       endDate,
+      cityId,
       UF,
       Cidade,
       NumeroLicitacao,
@@ -55,14 +56,18 @@ class AgreementController {
             )
           : true,
       );
+    if (cityId)
+      agreements = agreements.filter(
+        agreement => agreement.company?.cityId === cityId,
+      );
 
     if (UF)
       agreements = agreements.filter(agreement =>
-        compareCaseInsensitive(agreement.uf, UF),
+        compareCaseInsensitive(agreement.company?.city.uf || '', UF),
       );
     if (Cidade)
       agreements = agreements.filter(agreement =>
-        compareCaseInsensitive(agreement.city, Cidade),
+        compareCaseInsensitive(agreement.company?.city.name || '', Cidade),
       );
     if (NumeroLicitacao)
       agreements = agreements.filter(agreement =>
@@ -217,8 +222,7 @@ class AgreementController {
       const {
         agreementId,
         name,
-        uf,
-        city,
+        company,
         status,
         start,
         end,
@@ -232,8 +236,13 @@ class AgreementController {
       return AgreementsRepository.create({
         agreementId,
         name,
-        uf,
-        city,
+        company: company
+          ? {
+              connect: {
+                id: company.id,
+              },
+            }
+          : undefined,
         status,
         start,
         end,

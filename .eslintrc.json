@@ -29,7 +29,8 @@
     "prettier/prettier": "error",
     "class-methods-use-this": "off",
     "no-restricted-syntax": "off",
-    "no-await-in-loop": "off"
+    "no-await-in-loop": "off",
+    "camelcase": "off"
   },
   "settings": {
     "import/resolver": {

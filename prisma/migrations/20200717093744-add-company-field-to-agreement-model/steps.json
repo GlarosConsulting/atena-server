@@ -1,0 +1,75 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Agreement",
+      "field": "company",
+      "type": "Company",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Agreement",
+          "field": "company"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Agreement",
+          "field": "company"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[companyId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Agreement",
+          "field": "company"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Agreement",
+      "field": "companyId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Agreement",
+      "field": "uf"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Agreement",
+      "field": "city"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Company",
+      "field": "Agreement",
+      "type": "Agreement",
+      "arity": "List"
+    }
+  ]
+}

@@ -7,6 +7,11 @@ import Repository from './Repository';
 
 export type Agreement = AgreementGetPayload<{
   include: {
+    company: {
+      include: {
+        city: true;
+      };
+    };
     proposalData: {
       include: {
         data: {
@@ -80,6 +85,11 @@ class AgreementRepository extends Repository<
   AgreementUpdateInput
 > {
   private readonly include = {
+    company: {
+      include: {
+        city: true,
+      },
+    },
     proposalData: {
       include: {
         data: {
@@ -196,8 +206,12 @@ class AgreementRepository extends Repository<
   async getTest(cities: string[]): Promise<Agreement[]> {
     const agreements = await this.prisma.agreement.findMany({
       where: {
-        city: {
-          in: cities,
+        company: {
+          city: {
+            name: {
+              in: cities,
+            },
+          },
         },
         accountability: {
           data: {

@@ -13,7 +13,7 @@ class CitiesRepository extends Repository<
   CityUpdateInput
 > {
   findAll(): Promise<City[]> {
-    return this.prisma.city.findMany({});
+    return this.prisma.city.findMany({ orderBy: { name: 'asc' } });
   }
 
   findById(id: string): Promise<City | null> {

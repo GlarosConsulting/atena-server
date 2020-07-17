@@ -3,7 +3,7 @@
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -24,13 +24,13 @@ model City {
 model Company {
   @@map(name: "companies")
 
-  id         String      @default(uuid()) @id
-  cnpj       String      @unique
-  name       String
-  city       City        @relation(fields: [cityId], references: [id])
-  cityId     String
-  sphere     String
-  agreements Agreement[]
+  id        String      @default(uuid()) @id
+  cnpj      String      @unique
+  name      String
+  city      City        @relation(fields: [cityId], references: [id])
+  cityId    String
+  sphere    String
+  Agreement Agreement[]
 }
 
 model User {

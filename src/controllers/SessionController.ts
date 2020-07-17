@@ -1,27 +1,19 @@
 import { Request, Response } from 'express';
-import ActiveDirectory from 'activedirectory2';
+import UsersRepository from '~/repositories/UsersRepository';
 
 class SessionController {
   async create(request: Request, response: Response) {
-    const config = {
-      url: 'ldap://ad-glaros.southcentralus.cloudapp.azure.com',
-      baseDN: 'dc=ad-glaros,dc=southcentralus,dc=cloudapp,dc=azure,dc=com',
-      username: 'andre.victor',
-      password: 'Desenvolvimento@123#',
-    };
+    const { email } = request.body;
 
-    const activeDirectory = new ActiveDirectory(config);
+    const user = await UsersRepository.findByEmail(email);
 
-    activeDirectory.authenticate(
-      config.username,
-      config.password,
-      (err, authenticated) => {
-        console.log('err', err);
-        console.log('authenticated', authenticated);
-      },
-    );
+    if (!user) {
+      return response
+        .status(404)
+        .json({ error: 'Invalid e-mail or password.' });
+    }
 
-    return response.json({ ok: true });
+    return response.json({ user });
   }
 }
 
