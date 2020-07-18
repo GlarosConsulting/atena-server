@@ -16,4 +16,8 @@ router.use('/groups', groupsRouter);
 router.use('/companies', companiesRouter);
 router.use('/cities', citiesRouter);
 
+router.get('/ping', (request, response) => {
+  return response.send('Pong');
+});
+
 export default router;
