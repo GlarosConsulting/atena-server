@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --inspect --transpileOnly --no-notify src/server.ts",
-    "build": "yarn migrate && ttsc",
-    "migrate": "prisma migrate up --experimental & prisma generate",
+    "build": "ttsc",
+    "migrate": "prisma generate && prisma migrate up --experimental",
     "start": "node dist/server.js"
   },
   "jest": {
