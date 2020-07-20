@@ -3,7 +3,7 @@ import path from 'path';
 import readExcelFile from 'read-excel-file/node';
 import axios from 'axios';
 
-import { CityUpdateOneRequiredWithoutCompanyInput } from '@prisma/client';
+import { CityUpdateOneRequiredWithoutCompaniesInput } from '@prisma/client';
 import uploadConfig from '../config/upload';
 import CompaniesRepository, {
   Company,
@@ -83,7 +83,7 @@ class CompanyController {
 
       const cityByIbge = await CitiesRepository.findByIbge(String(ibge));
 
-      let city: CityUpdateOneRequiredWithoutCompanyInput | null = null;
+      let city: CityUpdateOneRequiredWithoutCompaniesInput | null = null;
 
       if (cityByIbge) {
         city = {
