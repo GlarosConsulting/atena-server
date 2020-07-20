@@ -13,6 +13,7 @@ class AgreementController {
     const {
       beginDate,
       endDate,
+      sphere,
       cityId,
       UF,
       Cidade,
@@ -55,6 +56,10 @@ class AgreementController {
               parseISO(endDate),
             )
           : true,
+      );
+    if (sphere)
+      agreements = agreements.filter(
+        agreement => agreement.company?.sphere === sphere,
       );
     if (cityId)
       agreements = agreements.filter(
