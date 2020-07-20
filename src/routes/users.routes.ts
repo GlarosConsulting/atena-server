@@ -1,11 +1,20 @@
 import { Router } from 'express';
 
-import { celebrate, Joi } from 'celebrate';
+import { celebrate, Joi, celebrate } from 'celebrate';
 import UserController from '~/controllers/UserController';
 
 const usersRouter = Router();
 
 usersRouter.get('/', UserController.findAll);
+usersRouter.get(
+  '/:id',
+  celebrate({
+    params: {
+      id: Joi.string().uuid().required(),
+    },
+  }),
+  UserController.show,
+);
 usersRouter.post(
   '/',
   celebrate({

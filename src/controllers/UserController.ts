@@ -10,6 +10,20 @@ class UserController {
     return response.json(users);
   }
 
+  async show(request: Request, response: Response) {
+    const { id } = request.params;
+
+    const user = await UsersRepository.findById(id);
+
+    if (!user) {
+      return response
+        .status(404)
+        .json({ error: 'No user found with this ID.' });
+    }
+
+    return response.json(user);
+  }
+
   async create(request: Request, response: Response) {
     const { name, username, email, groupId } = request.body;
 
