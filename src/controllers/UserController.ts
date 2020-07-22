@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import UsersRepository from '../repositories/UsersRepository';
+import UsersRepository from '~/repositories/UsersRepository';
 import GroupsRepository from '~/repositories/GroupsRepository';
 
 class UserController {

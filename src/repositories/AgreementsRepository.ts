@@ -19,7 +19,16 @@ export type Agreement = AgreementGetPayload<{
             status: true;
           };
         };
-        programs: true;
+        programs: {
+          include: {
+            details: {
+              include: {
+                couterpartValues: true;
+                transferValues: true;
+              };
+            };
+          };
+        };
         participants: true;
       };
     };
@@ -68,7 +77,16 @@ export type Agreement = AgreementGetPayload<{
     };
     convenientExecution: {
       include: {
-        executionProcesses: true;
+        executionProcesses: {
+          include: {
+            details: true;
+          };
+        };
+        contracts: {
+          include: {
+            details: true;
+          };
+        };
       };
     };
     accountability: {
@@ -155,7 +173,16 @@ class AgreementRepository extends Repository<
     },
     convenientExecution: {
       include: {
-        executionProcesses: true,
+        executionProcesses: {
+          include: {
+            details: true,
+          },
+        },
+        contracts: {
+          include: {
+            details: true,
+          },
+        },
       },
     },
     accountability: {
