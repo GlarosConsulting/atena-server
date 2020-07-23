@@ -42,7 +42,7 @@ class CompanyController {
       .header('X-Total-Count', String(totalCount))
       .header(
         'X-Total-Pages',
-        rowsPerPage ? String(totalCount / Number(rowsPerPage)) : '1',
+        String(Math.ceil(totalCount / Number(rowsPerPage || totalCount))),
       )
       .json(companies);
   }
