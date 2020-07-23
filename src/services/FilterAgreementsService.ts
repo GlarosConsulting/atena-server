@@ -27,6 +27,7 @@ export interface Filters {
   ModalidadeLicitacao?: string;
   RegistroDePreco?: string;
   ValorLicitacao?: string;
+  customFilter: string;
 }
 
 const contains = (str?: string | null, value?: string) =>
