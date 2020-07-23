@@ -65,7 +65,7 @@ class AgreementController {
         company: company
           ? {
               connect: {
-                id: company.id,
+                cnpj: company.cnpj,
               },
             }
           : undefined,
