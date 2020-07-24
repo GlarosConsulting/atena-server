@@ -99,7 +99,7 @@ class AgreementController {
                             },
                           },
                         }
-                      : null,
+                      : undefined,
                   })),
                 }
               : undefined,
