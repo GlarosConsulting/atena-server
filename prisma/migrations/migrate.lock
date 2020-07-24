@@ -10,3 +10,4 @@
 20200717085126-alter-group-field-set-optional
 20200717093744-add-company-field-to-agreement-model
 20200717110508-alter-agreements-field-on-company-model
+20200724191814-add-optional-to-some-fields

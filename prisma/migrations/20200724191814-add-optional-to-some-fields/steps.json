@@ -1,0 +1,125 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateField",
+      "model": "Data",
+      "field": "status",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DisbursementChronoValues",
+      "field": "registered",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DisbursementChronoValues",
+      "field": "register",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DisbursementChronoValues",
+      "field": "total",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DetailedApplicationPlanValues",
+      "field": "assets",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DetailedApplicationPlanValues",
+      "field": "tributes",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DetailedApplicationPlanValues",
+      "field": "construction",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DetailedApplicationPlanValues",
+      "field": "services",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DetailedApplicationPlanValues",
+      "field": "others",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DetailedApplicationPlanValues",
+      "field": "administrative",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DetailedApplicationPlanValues",
+      "field": "total",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "ConsolidatedApplicationPlan",
+      "field": "total",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "ExecutionProcess",
+      "field": "convenientExecution",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "ExecutionProcess",
+      "field": "convenientExecutionId",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "ExecutionProcessDetails",
+      "field": "executionProcessRel",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "ExecutionProcessDetails",
+      "field": "executionProcessRelId",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "Contract",
+      "field": "convenientExecution",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "Contract",
+      "field": "convenientExecutionId",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "ContractDetails",
+      "field": "contract",
+      "arity": "Optional"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "ContractDetails",
+      "field": "contractId",
+      "arity": "Optional"
+    }
+  ]
+}
