@@ -92,7 +92,7 @@ class AgreementController {
                           create: {
                             ...el.details,
                             couterpartValues: {
-                              create: el.details.counterpartValues,
+                              create: el.details.couterpartValues,
                             },
                             transferValues: {
                               create: el.details.transferValues,
