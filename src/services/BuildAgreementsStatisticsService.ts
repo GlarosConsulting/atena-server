@@ -15,6 +15,7 @@ interface Response {
   completedContracts: StatisticsItem;
   topTenOrgans: TopTenOrganItem[];
   counterpart: CounterpartItem;
+  trimesters: Trimesters;
 }
 
 interface StatisticsItem {
@@ -32,6 +33,13 @@ interface CounterpartItem {
   financial: number;
   assetsAndServices: number;
   empty: number;
+}
+
+interface Trimesters {
+  0: number;
+  1: number;
+  2: number;
+  3: number;
 }
 
 const contains = (str?: string | null, value?: string) =>
@@ -239,6 +247,28 @@ class BuildAgreementsStatisticsService {
       ).length,
     };
 
+    const trimesters: Trimesters = {
+      '0': 0,
+      '1': 0,
+      '2': 0,
+      '3': 0,
+    };
+
+    const today = new Date();
+
+    agreements.forEach(agreement => {
+      const date = agreement.accountability?.data?.limitDate;
+
+      if (!date || date.getFullYear() !== today.getFullYear()) return;
+
+      const month = date.getMonth();
+
+      if (month >= 1 && month <= 3) trimesters[0]++;
+      else if (month >= 4 && month <= 6) trimesters[1]++;
+      else if (month >= 7 && month <= 9) trimesters[2]++;
+      else if (month >= 10 && month <= 12) trimesters[3]++;
+    });
+
     return {
       total,
       execution,
@@ -248,6 +278,7 @@ class BuildAgreementsStatisticsService {
       completedContracts,
       topTenOrgans,
       counterpart,
+      trimesters,
     };
   }
 }

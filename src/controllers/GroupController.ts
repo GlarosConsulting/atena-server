@@ -14,20 +14,22 @@ class GroupController {
   async create(request: Request, response: Response) {
     const { name, access, cityIds } = request.body;
 
-    const checkAllCitiesExists = await everyAsync(cityIds, cityId =>
-      CitiesRepository.existsById(cityId),
-    );
+    if (cityIds) {
+      const checkAllCitiesExists = await everyAsync(cityIds, cityId =>
+        CitiesRepository.existsById(cityId),
+      );
 
-    if (!checkAllCitiesExists) {
-      return response
-        .status(404)
-        .json({ error: 'Some provided city ID is invalid.' });
+      if (!checkAllCitiesExists) {
+        return response
+          .status(404)
+          .json({ error: 'Some provided city ID is invalid.' });
+      }
     }
 
     const group = await GroupsRepository.create({
       name,
       access,
-      cities: {
+      cities: cityIds && {
         connect: (cityIds as string[]).map(cityId => ({ id: cityId })),
       },
     });

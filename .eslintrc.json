@@ -30,7 +30,8 @@
     "class-methods-use-this": "off",
     "no-restricted-syntax": "off",
     "no-await-in-loop": "off",
-    "camelcase": "off"
+    "camelcase": "off",
+    "no-plusplus": "off"
   },
   "settings": {
     "import/resolver": {
