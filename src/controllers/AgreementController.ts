@@ -220,7 +220,7 @@ class AgreementController {
                     (el: any) => ({
                       ...el,
                       details: {
-                        create: el.details,
+                        create: el.details !== null ? el.details : undefined,
                       },
                     }),
                   ),
@@ -231,7 +231,7 @@ class AgreementController {
                   create: convenientExecution.contracts.map((el: any) => ({
                     ...el,
                     details: {
-                      create: el.details,
+                      create: el.details !== null ? el.details : undefined,
                     },
                   })),
                 }
