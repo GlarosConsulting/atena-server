@@ -74,7 +74,7 @@ class BuildAgreementsStatisticsService {
     const agreementsInExecutionModalityConvenio = agreements.filter(
       agreement =>
         contains(agreement.proposalData?.data?.modality, 'Convênio') &&
-        contains(agreement.proposalData?.data?.status.value, 'Em execução'),
+        contains(agreement.proposalData?.data?.status?.value, 'Em execução'),
     );
     const execution: StatisticsItem = {
       count: agreementsInExecutionModalityConvenio.length,
@@ -115,7 +115,7 @@ class BuildAgreementsStatisticsService {
           agreement.proposalData?.data?.modality,
           'Contrato de repasse',
         ) &&
-        contains(agreement.proposalData?.data?.status.value, 'Em execução'),
+        contains(agreement.proposalData?.data?.status?.value, 'Em execução'),
     );
     const transferInExecution: StatisticsItem = {
       count: agreementsInExecutionModalityRepasse.length,

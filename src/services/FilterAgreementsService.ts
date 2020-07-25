@@ -101,7 +101,7 @@ class FilterAgreementsService {
             agreement =>
               contains(agreement.proposalData?.data?.modality, 'Convênio') &&
               contains(
-                agreement.proposalData?.data?.status.value,
+                agreement.proposalData?.data?.status?.value,
                 'Em execução',
               ),
           );
@@ -122,7 +122,7 @@ class FilterAgreementsService {
                 'Contrato de repasse',
               ) &&
               contains(
-                agreement.proposalData?.data?.status.value,
+                agreement.proposalData?.data?.status?.value,
                 'Em execução',
               ),
           );
