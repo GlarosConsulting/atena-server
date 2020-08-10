@@ -1,5 +1,4 @@
 {
-  "extends": "./tsconfig.paths.json",
   "compilerOptions": {
     "sourceMap": true,
     "outDir": "dist",
@@ -8,5 +7,15 @@
       "esnext"
     ],
     "esModuleInterop": true,
-  }
+    "baseUrl": ".",
+    "rootDir": "./src",
+    "paths": {
+      "~/*": [
+        "./src/*"
+      ]
+    },
+  },
+  "include": [
+    "./src"
+  ]
 }
