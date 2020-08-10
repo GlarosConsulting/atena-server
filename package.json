@@ -5,7 +5,7 @@
   "author": "@andredezzy",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --watch \"src/\" --exec \"ts-node -C ttypescript src/server.ts\" -e ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --inspect --transpileOnly --no-notify --ignore-watch node_modules src/server.ts",
     "build": "ttsc",
     "migrate": "prisma migrate up --experimental & prisma generate",
     "start": "node dist/server.js"
