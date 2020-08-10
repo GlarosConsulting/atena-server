@@ -3,63 +3,11 @@
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
   provider = "prisma-client-js"
-}
-
-model City {
-  @@map(name: "cities")
-
-  id        String    @default(uuid()) @id
-  name      String
-  uf        String
-  ibge      String    @unique
-  companies Company[]
-  groups    Group[]
-}
-
-model Company {
-  @@map(name: "companies")
-
-  id         String      @default(uuid()) @id
-  cnpj       String      @unique
-  name       String
-  city       City        @relation(fields: [cityId], references: [id])
-  cityId     String
-  sphere     String
-  agreements Agreement[]
-}
-
-model User {
-  @@map(name: "users")
-
-  id       String  @default(uuid()) @id
-  name     String
-  username String  @unique
-  email    String  @unique
-  active   Boolean @default(true)
-  group    Group?  @relation(fields: [groupId], references: [id])
-  groupId  String?
-}
-
-model Group {
-  @@map(name: "groups")
-
-  id     String      @default(uuid()) @id
-  name   String
-  access GroupAccess @default(ANY)
-  cities City[]
-  users  User[]
-}
-
-enum GroupAccess {
-  ANY
-  MUNICIPAL_SPHERE
-  STATE_SPHERE
-  CITIES
 }
 
 model Agreement {
@@ -67,8 +15,8 @@ model Agreement {
 
   id                  String               @default(uuid()) @id
   agreementId         String?
-  company             Company?             @relation(fields: [companyId], references: [id])
-  companyId           String?
+  uf                  String?
+  city                String?
   name                String?
   status              String?
   start               DateTime?
@@ -102,7 +50,7 @@ model Data {
   proposalDataId                String?
   modality                      String?
   contractingStatus             String?
-  status                        Status?
+  status                        Status
   proposalId                    String?
   organId                       String?
   processId                     String?
@@ -271,12 +219,12 @@ model DisbursementChronoItem {
 model DisbursementChronoValues {
   @@map(name: "disbursement_chrono_values")
 
-  id                   String                   @default(uuid()) @id
-  disbursementChrono   DisbursementChrono?      @relation(fields: [disbursementChronoId], references: [id])
+  id                   String                  @default(uuid()) @id
+  disbursementChrono   DisbursementChrono?     @relation(fields: [disbursementChronoId], references: [id])
   disbursementChronoId String?
-  registered           DisbursementChronoValue? @relation("RegisteredDisbursementChronoValue")
-  register             DisbursementChronoValue? @relation("RegisterDisbursementChronoValue")
-  total                DisbursementChronoValue? @relation("TotalDisbursementChronoValue")
+  registered           DisbursementChronoValue @relation("RegisteredDisbursementChronoValue")
+  register             DisbursementChronoValue @relation("RegisterDisbursementChronoValue")
+  total                DisbursementChronoValue @relation("TotalDisbursementChronoValue")
 }
 
 model DisbursementChronoValue {
@@ -324,16 +272,16 @@ model DetailedApplicationPlanItem {
 model DetailedApplicationPlanValues {
   @@map(name: "detailed_application_plan_values")
 
-  id                        String                        @default(uuid()) @id
-  detailedApplicationPlan   DetailedApplicationPlan?      @relation(fields: [detailedApplicationPlanId], references: [id])
+  id                        String                       @default(uuid()) @id
+  detailedApplicationPlan   DetailedApplicationPlan?     @relation(fields: [detailedApplicationPlanId], references: [id])
   detailedApplicationPlanId String?
-  assets                    DetailedApplicationPlanValue? @relation("AssetsDetailedApplicationPlanValue")
-  tributes                  DetailedApplicationPlanValue? @relation("TributesDetailedApplicationPlanValue")
-  construction              DetailedApplicationPlanValue? @relation("ConstructionDetailedApplicationPlanValue")
-  services                  DetailedApplicationPlanValue? @relation("ServicesDetailedApplicationPlanValue")
-  others                    DetailedApplicationPlanValue? @relation("OthersDetailedApplicationPlanValue")
-  administrative            DetailedApplicationPlanValue? @relation("AdministrativeDetailedApplicationPlanValue")
-  total                     DetailedApplicationPlanValue? @relation("TotalDetailedApplicationPlanValue")
+  assets                    DetailedApplicationPlanValue @relation("AssetsDetailedApplicationPlanValue")
+  tributes                  DetailedApplicationPlanValue @relation("TributesDetailedApplicationPlanValue")
+  construction              DetailedApplicationPlanValue @relation("ConstructionDetailedApplicationPlanValue")
+  services                  DetailedApplicationPlanValue @relation("ServicesDetailedApplicationPlanValue")
+  others                    DetailedApplicationPlanValue @relation("OthersDetailedApplicationPlanValue")
+  administrative            DetailedApplicationPlanValue @relation("AdministrativeDetailedApplicationPlanValue")
+  total                     DetailedApplicationPlanValue @relation("TotalDetailedApplicationPlanValue")
 }
 
 model DetailedApplicationPlanValue {
@@ -367,7 +315,7 @@ model ConsolidatedApplicationPlan {
   workPlan   WorkPlan?                         @relation(fields: [workPlanId], references: [id])
   workPlanId String?
   list       ConsolidatedApplicationPlanItem[] @relation("ListConsolidatedApplicationPlanItems")
-  total      ConsolidatedApplicationPlanItem?  @relation("TotalConsolidatedApplicationPlanItems")
+  total      ConsolidatedApplicationPlanItem   @relation("TotalConsolidatedApplicationPlanItems")
 }
 
 model ConsolidatedApplicationPlanItem {
@@ -447,8 +395,8 @@ model ExecutionProcess {
   @@map(name: "execution_processes")
 
   id                    String                   @default(uuid()) @id
-  convenientExecution   ConvenientExecution?     @relation(fields: [convenientExecutionId], references: [id])
-  convenientExecutionId String?
+  convenientExecution   ConvenientExecution      @relation(fields: [convenientExecutionId], references: [id])
+  convenientExecutionId String
   executionId           String?
   type                  String?
   date                  DateTime?
@@ -463,9 +411,9 @@ model ExecutionProcess {
 model ExecutionProcessDetails {
   @@map(name: "execution_processes_details")
 
-  id                    String            @default(uuid()) @id
-  executionProcessRel   ExecutionProcess? @relation(fields: [executionProcessRelId], references: [id])
-  executionProcessRelId String?
+  id                    String           @default(uuid()) @id
+  executionProcessRel   ExecutionProcess @relation(fields: [executionProcessRelId], references: [id])
+  executionProcessRelId String
   executionProcess      String?
   buyType               String?
   status                String?
@@ -491,9 +439,9 @@ model ExecutionProcessDetails {
 model Contract {
   @@map(name: "contracts")
 
-  id                    String               @default(uuid()) @id
-  convenientExecution   ConvenientExecution? @relation(fields: [convenientExecutionId], references: [id])
-  convenientExecutionId String?
+  id                    String              @default(uuid()) @id
+  convenientExecution   ConvenientExecution @relation(fields: [convenientExecutionId], references: [id])
+  convenientExecutionId String
   contractId            String?
   biddingId             String?
   date                  DateTime?
@@ -504,8 +452,8 @@ model ContractDetails {
   @@map(name: "contracts_details")
 
   id                 String    @default(uuid()) @id
-  contract           Contract? @relation(fields: [contractId], references: [id])
-  contractId         String?
+  contract           Contract  @relation(fields: [contractId], references: [id])
+  contractId         String
   hiredDocument      String?
   hirerDocument      String?
   type               String?
@@ -547,4 +495,36 @@ model AccountabilityData {
   transferValue    Float?
   counterpartValue Float?
   yieldValue       Float?
+}
+
+model City {
+  @@map(name: "cities")
+
+  id      String    @default(uuid()) @id
+  name    String
+  uf      String
+  ibge    String    @unique
+  company Company[]
+  user    User[]
+}
+
+model Company {
+  @@map(name: "companies")
+
+  id     String @default(uuid()) @id
+  cnpj   String @unique
+  name   String
+  city   City   @relation(fields: [cityId], references: [id])
+  cityId String
+  sphere String
+}
+
+model User {
+  @@map(name: "users")
+
+  id       String  @default(uuid()) @id
+  username String
+  email    String
+  active   Boolean @default(true)
+  group    City[]
 }

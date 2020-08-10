@@ -1,0 +1,12 @@
+FROM node:alpine
+
+RUN mkdir -p /code
+
+WORKDIR /code
+
+ADD . /code
+
+RUN yarn install && \
+    yarn cache clean
+
+CMD [ "yarn", "migrate" ]

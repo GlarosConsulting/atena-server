@@ -527,4 +527,8 @@ model User {
   email    String
   active   Boolean @default(true)
   group    City[]
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> master

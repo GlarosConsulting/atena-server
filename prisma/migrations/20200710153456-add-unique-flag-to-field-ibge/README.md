@@ -39,7 +39,11 @@ migration 20200710131955-create-cities-and-users..20200710153456-add-unique-flag
    email    String
    active   Boolean @default(true)
    group    City[]
+<<<<<<< HEAD
 -}
+=======
+-}
+>>>>>>> master
 +}
 ```
 

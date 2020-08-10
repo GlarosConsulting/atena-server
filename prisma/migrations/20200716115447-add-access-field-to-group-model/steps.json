@@ -1,0 +1,47 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateEnum",
+      "enum": "GroupAccess",
+      "values": [
+        "ANY",
+        "MUNICIPAL_SPHERE",
+        "STATE_SPHERE",
+        "CITIES"
+      ]
+    },
+    {
+      "tag": "CreateField",
+      "model": "Group",
+      "field": "access",
+      "type": "GroupAccess",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Group",
+          "field": "access"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Group",
+          "field": "access"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "ANY"
+    }
+  ]
+}

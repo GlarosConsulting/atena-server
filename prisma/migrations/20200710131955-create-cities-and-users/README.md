@@ -90,7 +90,11 @@ migration 20200708135437-create-companies..20200710131955-create-cities-and-user
 +  email    String
 +  active   Boolean @default(true)
 +  group    City[]
+<<<<<<< HEAD
 +}
+=======
++}
+>>>>>>> master
 ```
 
 
