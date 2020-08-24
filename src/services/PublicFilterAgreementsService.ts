@@ -1,7 +1,8 @@
-import { format, isAfter, parseISO, isBefore } from 'date-fns'; // eslint-disable-line
+import { format, isAfter, parseISO, isBefore, parse } from 'date-fns'; // eslint-disable-line
 import ptBrLocale from 'date-fns/locale/pt-BR'; // eslint-disable-line
 
 import { Agreement } from '~/repositories/AgreementsRepository';
+import contains from '~/utils/contains';
 
 interface Request {
   agreements: Agreement[];
@@ -29,11 +30,6 @@ export interface PublicFilters {
   ValorLicitacao?: string;
   customFilter: string;
 }
-
-const containsCaseInsensitive = (
-  str: string | null | undefined,
-  compare: string,
-): boolean => (str ? str.toLowerCase().includes(compare.toLowerCase()) : false);
 
 export default class PublicFilterAgreementsService {
   public async execute({
@@ -65,18 +61,18 @@ export default class PublicFilterAgreementsService {
 
     if (beginDate)
       agreements = agreements.filter(agreement =>
-        agreement.proposalData?.data?.proposalDate
+        agreement.proposalData?.data?.biddingDate
           ? isAfter(
-              agreement.proposalData.data.proposalDate,
+              agreement.proposalData.data.biddingDate,
               parseISO(beginDate),
             )
           : true,
       );
     if (endDate)
       agreements = agreements.filter(agreement =>
-        agreement.proposalData?.data?.proposalDate
+        agreement.accountability?.data?.limitDate
           ? isBefore(
-              agreement.proposalData.data.proposalDate,
+              agreement.accountability?.data?.limitDate,
               parseISO(endDate),
             )
           : true,
@@ -94,66 +90,89 @@ export default class PublicFilterAgreementsService {
     if (customFilter) {
       switch (customFilter) {
         case 'empenhados':
-          agreements = agreements.filter(agreement =>
-            containsCaseInsensitive(
-              agreement.proposalData?.data?.modality,
-              'Convênio',
-            ),
+          agreements = agreements.filter(
+            agreement =>
+              contains(agreement.proposalData?.data?.modality, 'Convênio') ||
+              contains(
+                agreement.proposalData?.data?.modality,
+                'Contrato de Repasse',
+              ),
           );
           break;
         case 'execucao':
           agreements = agreements.filter(
             agreement =>
-              containsCaseInsensitive(
-                agreement.proposalData?.data?.modality,
-                'Convênio',
-              ) &&
-              containsCaseInsensitive(
+              (contains(agreement.proposalData?.data?.modality, 'Convênio') ||
+                contains(
+                  agreement.proposalData?.data?.modality,
+                  'Contrato de Repasse',
+                )) &&
+              contains(
                 agreement.proposalData?.data?.status?.value,
                 'Em execução',
               ),
           );
           break;
-        case 'contratos-repasse':
-          agreements = agreements.filter(agreement =>
-            containsCaseInsensitive(
-              agreement.proposalData?.data?.modality,
-              'Contrato de repasse',
-            ),
-          );
-          break;
-        case 'contratos-repasse-execucao':
+        case 'pendencias-negativadas':
           agreements = agreements.filter(
             agreement =>
-              containsCaseInsensitive(
-                agreement.proposalData?.data?.modality,
-                'Contrato de repasse',
-              ) &&
-              containsCaseInsensitive(
+              contains(
                 agreement.proposalData?.data?.status?.value,
-                'Em execução',
+                'Rejeitada',
+              ) &&
+              contains(
+                agreement.proposalData?.data?.status?.value,
+                'Inadimpl',
+              ) &&
+              contains(
+                agreement.proposalData?.data?.status?.value,
+                'Ressalvas',
               ),
           );
           break;
-        case 'licitacoes-concluidas':
-          agreements = agreements.filter(agreement =>
-            agreement.convenientExecution?.executionProcesses.some(
-              executionProcess =>
-                containsCaseInsensitive(
-                  executionProcess.details?.executionProcess,
-                  'Licitação',
-                ),
-            ),
+        case 'interrompidas':
+          agreements = agreements.filter(
+            agreement =>
+              contains(
+                agreement.proposalData?.data?.status?.value,
+                'Rescindido',
+              ) &&
+              contains(
+                agreement.proposalData?.data?.status?.value,
+                'Anulado',
+              ) &&
+              contains(
+                agreement.proposalData?.data?.status?.value,
+                'Cancelado',
+              ) &&
+              contains(agreement.proposalData?.data?.status?.value, 'Excluído'),
           );
           break;
-        case 'contratos-concluidos':
-          agreements = agreements.filter(agreement =>
-            agreement.convenientExecution?.contracts.some(contract =>
-              contract.details?.endDate
-                ? isBefore(contract.details?.endDate, new Date())
-                : true,
-            ),
+        case 'procedimentos':
+          agreements = agreements.filter(
+            agreement =>
+              contains(agreement.proposalData?.data?.modality, 'Licitação') ||
+              contains(agreement.proposalData?.data?.modality, 'Dispensa') ||
+              contains(
+                agreement.proposalData?.data?.modality,
+                'Inexigibilidade',
+              ) ||
+              contains(agreement.proposalData?.data?.modality, 'Subconvênio'),
           );
+          break;
+        case 'concluidas':
+          agreements = agreements.filter(agreement => {
+            const validity = agreement.accountability?.data?.validity;
+
+            if (!validity) return false;
+
+            const [, endValidityDate] = validity.split(' a ');
+
+            return isBefore(
+              parse(endValidityDate, 'dd/MM/yyyy', new Date()),
+              new Date(),
+            );
+          });
           break;
         default:
           break;
@@ -162,19 +181,19 @@ export default class PublicFilterAgreementsService {
 
     if (UF)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(agreement.company?.city.uf || '', UF),
+        contains(agreement.company?.city.uf || '', UF),
       );
     if (Cidade)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(agreement.company?.city.name || '', Cidade),
+        contains(agreement.company?.city.name || '', Cidade),
       );
     if (NumeroLicitacao)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(agreement.agreementId, NumeroLicitacao),
+        contains(agreement.agreementId, NumeroLicitacao),
       );
     if (NumProcessoLicitacao)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(
+        contains(
           agreement.proposalData?.data?.processId
             ? agreement.proposalData?.data?.processId
             : null,
@@ -183,7 +202,7 @@ export default class PublicFilterAgreementsService {
       );
     if (ObjetoLicitacao)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(
+        contains(
           agreement.proposalData?.data?.object
             ? agreement.proposalData?.data?.object
             : null,
@@ -192,7 +211,7 @@ export default class PublicFilterAgreementsService {
       );
     if (NumeroEdital)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(
+        contains(
           agreement.proposalData?.data?.proposalId
             ? agreement.proposalData?.data?.proposalId
             : null,
@@ -201,7 +220,7 @@ export default class PublicFilterAgreementsService {
       );
     if (DataPublicacaoEdital)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(
+        contains(
           agreement.proposalData?.data?.proposalDate
             ? format(agreement.proposalData?.data?.proposalDate, 'dd/MM/yyyy', {
                 locale: ptBrLocale,
@@ -212,7 +231,7 @@ export default class PublicFilterAgreementsService {
       );
     if (DataLicitacao)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(
+        contains(
           agreement.proposalData?.data?.biddingDate
             ? format(agreement.proposalData?.data?.biddingDate, 'dd/MM/yyyy', {
                 locale: ptBrLocale,
@@ -223,7 +242,7 @@ export default class PublicFilterAgreementsService {
       );
     if (DataHomologacao)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(
+        contains(
           agreement.proposalData?.data?.homologationDate
             ? format(
                 agreement.proposalData?.data?.homologationDate,
@@ -236,7 +255,7 @@ export default class PublicFilterAgreementsService {
       );
     if (ReferenciaLegal)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(
+        contains(
           agreement.proposalData?.data?.legalFoundation
             ? agreement.proposalData?.data?.legalFoundation
             : null,
@@ -245,7 +264,7 @@ export default class PublicFilterAgreementsService {
       );
     if (DescricaoLicitacao)
       agreements = agreements.filter(agreement =>
-        containsCaseInsensitive(
+        contains(
           agreement.proposalData?.data?.justification
             ? agreement.proposalData?.data?.justification
             : null,
@@ -256,7 +275,7 @@ export default class PublicFilterAgreementsService {
       agreements = agreements.filter(agreement =>
         agreement.convenientExecution
           ? agreement.convenientExecution.executionProcesses.some(process =>
-              containsCaseInsensitive(process.type, ModalidadeLicitacao),
+              contains(process.type, ModalidadeLicitacao),
             )
           : true,
       );
@@ -264,7 +283,7 @@ export default class PublicFilterAgreementsService {
       agreements = agreements.filter(agreement =>
         agreement.convenientExecution
           ? agreement.convenientExecution.executionProcesses.some(process =>
-              containsCaseInsensitive(
+              contains(
                 process.date
                   ? format(process.date, 'dd/MM/yyyy', { locale: ptBrLocale })
                   : null,
@@ -277,7 +296,7 @@ export default class PublicFilterAgreementsService {
       agreements = agreements.filter(agreement =>
         agreement.proposalData
           ? agreement.proposalData.programs.some(program =>
-              containsCaseInsensitive(
+              contains(
                 program.value
                   ? Intl.NumberFormat('pt-BR', {
                       style: 'currency',

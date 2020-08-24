@@ -2,6 +2,7 @@ import {
   AgreementGetPayload,
   AgreementCreateInput,
   AgreementUpdateInput,
+  AgreementWhereInput,
 } from '@prisma/client';
 import Repository from './Repository';
 
@@ -192,8 +193,9 @@ class AgreementRepository extends Repository<
     },
   };
 
-  findAll(): Promise<Agreement[]> {
+  findAll(where?: AgreementWhereInput): Promise<Agreement[]> {
     return this.prisma.agreement.findMany({
+      where,
       include: this.include,
     });
   }
