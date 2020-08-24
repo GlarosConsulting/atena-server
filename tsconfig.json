@@ -7,11 +7,15 @@
       "esnext"
     ],
     "esModuleInterop": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
+    "rootDir": "./src",
     "paths": {
       "~/*": [
-        "src/*"
+        "./src/*"
       ]
-    }
-  }
+    },
+  },
+  "include": [
+    "./src"
+  ]
 }
