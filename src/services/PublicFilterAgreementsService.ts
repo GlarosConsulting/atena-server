@@ -14,6 +14,7 @@ export interface PublicFilters {
   endDate: string;
   sphere: string;
   cityIds: string[];
+  onlyAlerts: string;
   UF?: string;
   Cidade?: string;
   NumeroLicitacao?: string;
@@ -37,11 +38,13 @@ export default class PublicFilterAgreementsService {
     filters,
   }: Request): Promise<Agreement[]> {
     let agreements = _agreements;
+
     const {
       beginDate,
       endDate,
       sphere,
       cityIds,
+      onlyAlerts,
       customFilter,
       UF,
       Cidade,
@@ -68,6 +71,7 @@ export default class PublicFilterAgreementsService {
             )
           : true,
       );
+
     if (endDate)
       agreements = agreements.filter(agreement =>
         agreement.accountability?.data?.limitDate
@@ -77,16 +81,35 @@ export default class PublicFilterAgreementsService {
             )
           : true,
       );
+
     if (sphere)
       agreements = agreements.filter(
         agreement => agreement.company?.sphere === sphere,
       );
+
     if (cityIds && cityIds.length > 0)
       agreements = agreements.filter(agreement =>
         agreement.company?.cityId
           ? cityIds.includes(agreement.company?.cityId)
           : true,
       );
+
+    if (onlyAlerts === 'true') {
+      agreements = agreements.filter(agreement =>
+        agreement.convenientExecution?.executionProcesses.some(
+          executionProcess =>
+            contains(executionProcess.details?.executionProcess, 'Licitação'),
+        ),
+      );
+
+      agreements = agreements.filter(agreement =>
+        contains(
+          agreement.accountability?.data?.status,
+          'Enviada para Análise',
+        ),
+      );
+    }
+
     if (customFilter) {
       switch (customFilter) {
         case 'empenhados':
@@ -183,14 +206,17 @@ export default class PublicFilterAgreementsService {
       agreements = agreements.filter(agreement =>
         contains(agreement.company?.city.uf || '', UF),
       );
+
     if (Cidade)
       agreements = agreements.filter(agreement =>
         contains(agreement.company?.city.name || '', Cidade),
       );
+
     if (NumeroLicitacao)
       agreements = agreements.filter(agreement =>
         contains(agreement.agreementId, NumeroLicitacao),
       );
+
     if (NumProcessoLicitacao)
       agreements = agreements.filter(agreement =>
         contains(
@@ -200,6 +226,7 @@ export default class PublicFilterAgreementsService {
           NumProcessoLicitacao,
         ),
       );
+
     if (ObjetoLicitacao)
       agreements = agreements.filter(agreement =>
         contains(
@@ -209,6 +236,7 @@ export default class PublicFilterAgreementsService {
           ObjetoLicitacao,
         ),
       );
+
     if (NumeroEdital)
       agreements = agreements.filter(agreement =>
         contains(
@@ -218,6 +246,7 @@ export default class PublicFilterAgreementsService {
           NumeroEdital,
         ),
       );
+
     if (DataPublicacaoEdital)
       agreements = agreements.filter(agreement =>
         contains(
@@ -229,6 +258,7 @@ export default class PublicFilterAgreementsService {
           DataPublicacaoEdital,
         ),
       );
+
     if (DataLicitacao)
       agreements = agreements.filter(agreement =>
         contains(
@@ -240,6 +270,7 @@ export default class PublicFilterAgreementsService {
           DataLicitacao,
         ),
       );
+
     if (DataHomologacao)
       agreements = agreements.filter(agreement =>
         contains(
@@ -253,6 +284,7 @@ export default class PublicFilterAgreementsService {
           DataHomologacao,
         ),
       );
+
     if (ReferenciaLegal)
       agreements = agreements.filter(agreement =>
         contains(
@@ -262,6 +294,7 @@ export default class PublicFilterAgreementsService {
           ReferenciaLegal,
         ),
       );
+
     if (DescricaoLicitacao)
       agreements = agreements.filter(agreement =>
         contains(
@@ -271,6 +304,7 @@ export default class PublicFilterAgreementsService {
           DescricaoLicitacao,
         ),
       );
+
     if (ModalidadeLicitacao)
       agreements = agreements.filter(agreement =>
         agreement.convenientExecution
@@ -279,6 +313,7 @@ export default class PublicFilterAgreementsService {
             )
           : true,
       );
+
     if (RegistroDePreco)
       agreements = agreements.filter(agreement =>
         agreement.convenientExecution
@@ -292,6 +327,7 @@ export default class PublicFilterAgreementsService {
             )
           : true,
       );
+
     if (ValorLicitacao)
       agreements = agreements.filter(agreement =>
         agreement.proposalData
