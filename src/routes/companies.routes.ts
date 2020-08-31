@@ -13,13 +13,14 @@ companiesRouter.get(
   celebrate(
     {
       query: Joi.object().keys({
+        cities: Joi.array().items(Joi.string()),
         page: Joi.number(),
         rowsPerPage: Joi.number(),
       }),
     },
     { abortEarly: false },
   ),
-  CompaniesController.findAll,
+  CompaniesController.index,
 );
 companiesRouter.post(
   '/import',

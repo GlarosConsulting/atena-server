@@ -2,10 +2,13 @@ import { Router } from 'express';
 import { celebrate, Joi } from 'celebrate';
 
 import AgreementsController from '~/controllers/AgreementsController';
+import PendingAgreementsController from '~/controllers/PendingAgreementsController';
 
 const agreementsRouter = Router();
 
 agreementsRouter.get('/', AgreementsController.index);
+agreementsRouter.get('/pending', PendingAgreementsController.index);
+
 agreementsRouter.get(
   '/:id',
   celebrate(
@@ -51,6 +54,7 @@ agreementsRouter.delete(
   ),
   AgreementsController.delete,
 );
+
 agreementsRouter.patch('/test', AgreementsController.test);
 
 export default agreementsRouter;
