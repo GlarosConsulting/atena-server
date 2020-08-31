@@ -64,8 +64,22 @@ class AgreementRepository extends Repository<
     return count > 0;
   }
 
-  count(): Promise<number> {
-    return this.prisma.company.count();
+  count({ cities }: { cities?: string[] }): Promise<number> {
+    let args: FindManyCompanyArgs = {};
+
+    if (cities) {
+      args = {
+        where: {
+          city: {
+            name: {
+              in: cities,
+            },
+          },
+        },
+      };
+    }
+
+    return this.prisma.company.count({ ...args });
   }
 
   findByCnpj(cnpj: string): Promise<Company | null> {
@@ -76,20 +90,33 @@ class AgreementRepository extends Repository<
   }
 
   async findAllPaginated({
+    cities,
     page,
     rowsPerPage,
-  }: Pagination): Promise<Company[]> {
-    let pagination: FindManyCompanyArgs = {};
+  }: { cities?: string[] } & Pagination): Promise<Company[]> {
+    let args: FindManyCompanyArgs = {};
+
+    if (cities) {
+      args = {
+        where: {
+          city: {
+            name: {
+              in: cities,
+            },
+          },
+        },
+      };
+    }
 
     if (page && rowsPerPage) {
-      pagination = {
+      args = {
         skip: (page - 1) * rowsPerPage,
         take: rowsPerPage,
       };
     }
 
     const companies = await this.prisma.company.findMany({
-      ...pagination,
+      ...args,
       include: this.include,
     });
 

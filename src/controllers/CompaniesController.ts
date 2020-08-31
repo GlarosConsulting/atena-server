@@ -29,14 +29,17 @@ interface IBGECityResponse {
 }
 
 class CompaniesController {
-  async findAll(request: Request, response: Response) {
-    const { page, rowsPerPage } = request.query;
+  async index(request: Request, response: Response) {
+    const { cities, page, rowsPerPage } = request.query;
 
     const companies = await CompaniesRepository.findAllPaginated({
+      cities: cities as string[],
       page: Number(page),
       rowsPerPage: Number(rowsPerPage),
     });
-    const totalCount = await CompaniesRepository.count();
+    const totalCount = await CompaniesRepository.count({
+      cities: cities as string[],
+    });
 
     return response
       .header('X-Total-Count', String(totalCount))
