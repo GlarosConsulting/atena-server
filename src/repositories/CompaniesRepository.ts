@@ -108,7 +108,7 @@ class AgreementRepository extends Repository<
       };
     }
 
-    if (page && rowsPerPage) {
+    if (!cities && page && rowsPerPage) {
       args = {
         skip: (page - 1) * rowsPerPage,
         take: rowsPerPage,
