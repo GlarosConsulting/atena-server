@@ -1,4 +1,5 @@
-import { format, isAfter, parseISO, isBefore, parse } from 'date-fns'; // eslint-disable-line
+import { format, isAfter, parseISO, isBefore, parse, startOfDay, addMinutes, endOfDay } from 'date-fns'; // eslint-disable-line
+import { utcToZonedTime } from 'date-fns-tz'; // eslint-disable-line
 import ptBrLocale from 'date-fns/locale/pt-BR'; // eslint-disable-line
 
 import { Agreement } from '~/repositories/AgreementsRepository';
@@ -66,8 +67,16 @@ export default class PublicFilterAgreementsService {
       agreements = agreements.filter(agreement =>
         agreement.proposalData?.data?.biddingDate
           ? isAfter(
-              agreement.proposalData.data.biddingDate,
-              parseISO(beginDate),
+              addMinutes(
+                startOfDay(
+                  utcToZonedTime(
+                    agreement.proposalData.data.biddingDate,
+                    'UTC',
+                  ),
+                ),
+                10,
+              ),
+              startOfDay(parseISO(beginDate)),
             )
           : true,
       );
@@ -76,8 +85,16 @@ export default class PublicFilterAgreementsService {
       agreements = agreements.filter(agreement =>
         agreement.accountability?.data?.limitDate
           ? isBefore(
-              agreement.accountability?.data?.limitDate,
-              parseISO(endDate),
+              addMinutes(
+                endOfDay(
+                  utcToZonedTime(
+                    agreement.accountability.data.limitDate,
+                    'UTC',
+                  ),
+                ),
+                10,
+              ),
+              endOfDay(parseISO(endDate)),
             )
           : true,
       );
