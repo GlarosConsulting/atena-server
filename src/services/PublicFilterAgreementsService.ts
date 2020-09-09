@@ -1,4 +1,4 @@
-import { format, isAfter, parseISO, isBefore, parse, startOfDay, addMinutes, endOfDay } from 'date-fns'; // eslint-disable-line
+import { format, isAfter, parseISO, isBefore, parse, startOfDay, addMinutes, endOfDay, subMinutes } from 'date-fns'; // eslint-disable-line
 import { utcToZonedTime } from 'date-fns-tz'; // eslint-disable-line
 import ptBrLocale from 'date-fns/locale/pt-BR'; // eslint-disable-line
 
@@ -63,6 +63,17 @@ export default class PublicFilterAgreementsService {
       ValorLicitacao,
     } = filters;
 
+    console.log(beginDate);
+    console.log(parseISO(beginDate));
+    console.log(startOfDay(parseISO(beginDate)));
+    console.log(agreements[0].agreementId);
+    console.log(
+      utcToZonedTime(agreements[0].proposalData?.data?.biddingDate, 'UTC'),
+    );
+    console.log(
+      utcToZonedTime(agreements[0].accountability.data.limitDate, 'UTC'),
+    );
+
     if (beginDate)
       agreements = agreements.filter(agreement =>
         agreement.proposalData?.data?.biddingDate
@@ -85,7 +96,7 @@ export default class PublicFilterAgreementsService {
       agreements = agreements.filter(agreement =>
         agreement.accountability?.data?.limitDate
           ? isBefore(
-              addMinutes(
+              subMinutes(
                 endOfDay(
                   utcToZonedTime(
                     agreement.accountability.data.limitDate,
