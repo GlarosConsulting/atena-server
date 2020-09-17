@@ -63,17 +63,6 @@ export default class PublicFilterAgreementsService {
       ValorLicitacao,
     } = filters;
 
-    console.log(beginDate);
-    console.log(parseISO(beginDate));
-    console.log(startOfDay(parseISO(beginDate)));
-    console.log(agreements[0].agreementId);
-    console.log(
-      utcToZonedTime(agreements[0].proposalData?.data?.biddingDate, 'UTC'),
-    );
-    console.log(
-      utcToZonedTime(agreements[0].accountability.data.limitDate, 'UTC'),
-    );
-
     if (beginDate)
       agreements = agreements.filter(agreement =>
         agreement.proposalData?.data?.biddingDate
@@ -94,12 +83,12 @@ export default class PublicFilterAgreementsService {
 
     if (endDate)
       agreements = agreements.filter(agreement =>
-        agreement.accountability?.data?.limitDate
+        agreement.proposalData?.data?.biddingDate
           ? isBefore(
               subMinutes(
                 endOfDay(
                   utcToZonedTime(
-                    agreement.accountability.data.limitDate,
+                    agreement.proposalData.data.biddingDate,
                     'UTC',
                   ),
                 ),
