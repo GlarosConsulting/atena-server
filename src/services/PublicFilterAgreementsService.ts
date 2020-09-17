@@ -83,12 +83,12 @@ export default class PublicFilterAgreementsService {
 
     if (endDate)
       agreements = agreements.filter(agreement =>
-        agreement.accountability?.data?.limitDate
+        agreement.proposalData?.data?.biddingDate
           ? isBefore(
               subMinutes(
                 endOfDay(
                   utcToZonedTime(
-                    agreement.accountability.data.limitDate,
+                    agreement.proposalData.data.biddingDate,
                     'UTC',
                   ),
                 ),
