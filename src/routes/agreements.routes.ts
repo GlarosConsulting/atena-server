@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import { celebrate, Joi } from 'celebrate';
+import { celebrate, Joi, Segments } from 'celebrate';
 
 import AgreementsController from '~/controllers/AgreementsController';
-import PendingAgreementsController from '~/controllers/PendingAgreementsController';
+import OldestAgreementController from '~/controllers/OldestAgreementController';
 
 const agreementsRouter = Router();
 
 agreementsRouter.get('/', AgreementsController.index);
-agreementsRouter.get('/pending', PendingAgreementsController.index);
+
+agreementsRouter.get('/oldest', OldestAgreementController.index);
 
 agreementsRouter.get(
   '/:id',

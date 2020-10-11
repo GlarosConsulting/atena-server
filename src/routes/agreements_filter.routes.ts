@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { celebrate, Joi } from 'celebrate';
 
-import AgreementController from '~/controllers/AgreementsFilterController';
+import AgreementsFilterController from '~/controllers/AgreementsFilterController';
 
 const agreementsFilterRouter = Router();
 
@@ -12,7 +12,7 @@ agreementsFilterRouter.post(
       filters: Joi.object().required(),
     }),
   }),
-  AgreementController.index,
+  AgreementsFilterController.index,
 );
 
 export default agreementsFilterRouter;

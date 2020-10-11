@@ -200,6 +200,12 @@ class AgreementRepository extends Repository<
     });
   }
 
+  findOldest(): Promise<Agreement[]> {
+    return this.prisma.agreement.findMany({
+      include: this.include,
+    });
+  }
+
   findById(id: string): Promise<Agreement | null> {
     return this.prisma.agreement.findOne({
       where: { id },
