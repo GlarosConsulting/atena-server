@@ -8,6 +8,7 @@ import PublicFilterAgreementsService, {
 import FilterAgreementsService, {
   Filters,
 } from '~/services/FilterAgreementsService';
+import BuildPendingAgreementsService from '~/services/BuildPendingAgreementsService';
 
 class AgreementsFilterController {
   async index(request: Request, response: Response) {
@@ -19,21 +20,27 @@ class AgreementsFilterController {
     const publicFilterAgreements = new PublicFilterAgreementsService();
     const filterAgreements = new FilterAgreementsService();
     const buildAgreementsStatistics = new BuildAgreementsStatisticsService();
+    const buildPendingAgreementsService = new BuildPendingAgreementsService();
 
     agreements = await publicFilterAgreements.execute({
       agreements,
       filters: publicFilters,
     });
+
     agreements = await filterAgreements.execute({
       agreements,
       filters,
+    });
+
+    const pendingAgreements = await buildPendingAgreementsService.execute({
+      agreements,
     });
 
     const statistics = buildAgreementsStatistics.execute({ agreements });
 
     return response
       .header('X-Total-Count', String(agreements.length))
-      .json({ statistics, agreements });
+      .json({ statistics, agreements, pendingAgreements });
   }
 }
 

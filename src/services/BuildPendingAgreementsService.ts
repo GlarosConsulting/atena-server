@@ -1,6 +1,13 @@
+import { endOfDay, isBefore, subMinutes } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 import AgreementsRepository, {
   Agreement,
 } from '~/repositories/AgreementsRepository';
+import contains from '~/utils/contains';
+
+interface IRequest {
+  agreements: Agreement[];
+}
 
 interface PendingAgreement {
   name: string;
@@ -8,17 +15,18 @@ interface PendingAgreement {
   percentage: number;
 }
 
-class FindPendingAgreementsService {
-  public async execute(): Promise<PendingAgreement[]> {
-    const agreements = await AgreementsRepository.findAll({
-      accountability: {
-        data: {
-          limitDate: {
-            lt: new Date(),
-          },
-        },
-      },
-    });
+class BuildPendingAgreementsService {
+  public async execute({
+    agreements: originalAgreements,
+  }: IRequest): Promise<PendingAgreement[]> {
+    const agreements = originalAgreements.filter(agreement =>
+      agreement.accountability?.data?.limitDate
+        ? isBefore(
+            utcToZonedTime(agreement.accountability.data.limitDate, 'UTC'),
+            new Date(),
+          )
+        : true,
+    );
 
     const topPendingAgreementsCities: Agreement[] = agreements
       .sort(
@@ -82,4 +90,4 @@ class FindPendingAgreementsService {
   }
 }
 
-export default FindPendingAgreementsService;
+export default BuildPendingAgreementsService;

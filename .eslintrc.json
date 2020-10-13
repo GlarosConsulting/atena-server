@@ -19,19 +19,20 @@
     "prettier"
   ],
   "rules": {
+    "prettier/prettier": "error",
+    "class-methods-use-this": "off",
+    "no-restricted-syntax": "off",
+    "no-await-in-loop": "off",
+    "camelcase": "off",
+    "no-plusplus": "off",
+    "@typescript-eslint/no-explicit-any": "off",
     "import/extensions": [
       "error",
       "ignorePackages",
       {
         "ts": "never"
       }
-    ],
-    "prettier/prettier": "error",
-    "class-methods-use-this": "off",
-    "no-restricted-syntax": "off",
-    "no-await-in-loop": "off",
-    "camelcase": "off",
-    "no-plusplus": "off"
+    ]
   },
   "settings": {
     "import/resolver": {
